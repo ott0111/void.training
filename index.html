@@ -1,1358 +1,288 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VOID | Mod Training Suite</title>
-  <meta name="color-scheme" content="dark">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    :root{
-      --bg:#070812;
-      --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.08);
-      --stroke: rgba(255,255,255,.10);
-      --text:#eae6ff;
-      --muted: rgba(234,230,255,.70);
-      --muted2: rgba(234,230,255,.55);
-      --accent:#a855f7;
-      --accent2:#7c3aed;
-      --good:#22c55e;
-      --bad:#ef4444;
-      --warn:#f59e0b;
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --radius: 18px;
-      --radius2: 14px;
-      --mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0; font-family: var(--sans);
-      background:
-        radial-gradient(1200px 700px at 18% -10%, rgba(168,85,247,.18), transparent 55%),
-        radial-gradient(900px 600px at 85% 0%, rgba(124,58,237,.14), transparent 55%),
-        radial-gradient(900px 700px at 50% 120%, rgba(168,85,247,.10), transparent 60%),
-        var(--bg);
-      color:var(--text);
-      overflow-x:hidden;
-    }
-    a{ color:inherit; text-decoration:none; }
-    button{ font-family:inherit; }
-    .noise{
-      position:fixed; inset:0; pointer-events:none; opacity:.10; mix-blend-mode: overlay;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
-      background-size:180px 180px;
-    }
-    .vfx{
-      position:fixed; inset:-2px; pointer-events:none;
-      background:
-        radial-gradient(900px 300px at 20% 0%, rgba(168,85,247,.12), transparent 70%),
-        radial-gradient(700px 260px at 80% 10%, rgba(124,58,237,.10), transparent 70%);
-      filter: blur(0px);
-    }
+<title>Void Mod Training</title>
 
-    /* App shell */
-    .app{
-      display:grid;
-      grid-template-columns: 80px 280px 1fr;
-      min-height:100vh;
-    }
-    .servers{
-      border-right:1px solid var(--stroke);
-      background: rgba(0,0,0,.18);
-      padding:14px 10px;
-      position:sticky; top:0; height:100vh;
-      display:flex; flex-direction:column; gap:10px;
-      backdrop-filter: blur(10px);
-    }
-    .svr{
-      width:56px; height:56px; border-radius:16px;
-      display:grid; place-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-      border:1px solid var(--stroke);
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      position:relative;
-      transition: transform .18s ease, border-color .18s ease;
-      overflow:hidden;
-      cursor:pointer;
-      user-select:none;
-    }
-    .svr:hover{ transform: translateY(-2px); border-color: rgba(168,85,247,.35); }
-    .svr .dot{
-      position:absolute; left:-8px; width:10px; height:24px; border-radius:10px;
-      background: rgba(255,255,255,.85);
-      opacity:0; transition: opacity .18s ease;
-    }
-    .svr.active .dot{ opacity:1; }
-    .svr .logo{
-      font-weight:900; letter-spacing:.08em;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      font-size:18px;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-    .sidebar{
-      border-right:1px solid var(--stroke);
-      background: rgba(0,0,0,.16);
-      padding:16px 14px;
-      position:sticky; top:0; height:100vh;
-      backdrop-filter: blur(12px);
-      display:flex; flex-direction:column;
-      gap:14px;
-    }
-    .brand{
-      display:flex; gap:12px; align-items:center;
-      padding:10px 10px;
-      border:1px solid var(--stroke);
-      border-radius: var(--radius2);
-      background: rgba(255,255,255,.04);
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
-    .brand .img{
-      width:38px; height:38px; border-radius:12px;
-      background: radial-gradient(circle at top, rgba(168,85,247,.35), rgba(255,255,255,.06));
-      border:1px solid rgba(168,85,247,.20);
-      display:grid; place-items:center;
-      font-weight:900;
-    }
-    .brand h1{
-      font-size:12px; margin:0;
-      letter-spacing:.12em;
-    }
-    .brand p{
-      margin:2px 0 0; font-size:11px; color: var(--muted);
-    }
+<style>
 
-    .chanGroup{
-      margin-top:4px;
-      padding:8px 10px;
-      color: var(--muted2);
-      font-size:11px;
-      letter-spacing:.10em;
-      text-transform: uppercase;
-    }
-    .chan{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:10px 10px;
-      border-radius:12px;
-      color: var(--muted);
-      cursor:pointer;
-      transition: background .18s ease, color .18s ease;
-    }
-    .chan:hover{ background: rgba(255,255,255,.06); color: var(--text); }
-    .chan.active{
-      background: linear-gradient(90deg, rgba(168,85,247,.18), rgba(255,255,255,.06));
-      border:1px solid rgba(168,85,247,.22);
-      color: var(--text);
-    }
-    .chan .pill{
-      font-size:11px;
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.85);
-    }
-    .sbfoot{
-      margin-top:auto;
-      padding:10px;
-      border-radius: 14px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .sbfoot span{ color: var(--muted); font-size:12px; }
-    .sbfoot code{
-      font-family: var(--mono);
-      font-size:11px;
-      padding:4px 8px;
-      border-radius: 10px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.25);
-      color: rgba(255,255,255,.85);
-    }
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:'Inter',sans-serif;
+}
 
-    .main{
-      padding:18px 18px 40px;
-    }
+body{
+background:#07040d;
+color:white;
+overflow-x:hidden;
+}
 
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:12px 14px;
-      border-radius: var(--radius);
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      box-shadow: var(--shadow);
-      position:sticky; top:14px; z-index:5;
-      backdrop-filter: blur(12px);
-    }
-    .crumb{
-      display:flex; align-items:center; gap:10px;
-      color: var(--muted);
-      font-size:13px;
-    }
-    .crumb b{ color: var(--text); }
-    .crumb .dot{
-      width:5px; height:5px; border-radius:999px;
-      background: rgba(255,255,255,.35);
-    }
-    .actions{
-      display:flex; gap:10px; align-items:center;
-    }
-    .btn{
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.25);
-      color: rgba(255,255,255,.88);
-      padding:10px 12px;
-      border-radius: 14px;
-      cursor:pointer;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
-      font-weight:650;
-      font-size:13px;
-      display:inline-flex; align-items:center; gap:8px;
-    }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(168,85,247,.35); }
-    .btn.primary{
-      background: linear-gradient(90deg, rgba(168,85,247,.25), rgba(124,58,237,.18));
-      border-color: rgba(168,85,247,.35);
-    }
-    .btn.ghost{
-      background: rgba(255,255,255,.04);
-    }
+/* background glow */
 
-    .hero{
-      margin-top:14px;
-      border-radius: var(--radius);
-      border: 1px solid var(--stroke);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .heroInner{
-      padding:18px 18px 16px;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:14px;
-    }
-    .kicker{
-      display:inline-flex; align-items:center; gap:10px;
-      font-size:12px;
-      color: rgba(255,255,255,.80);
-      letter-spacing:.08em;
-      text-transform: uppercase;
-    }
-    .spark{
-      width:10px; height:10px; border-radius:999px;
-      background: radial-gradient(circle at top, rgba(255,255,255,.95), rgba(168,85,247,.35));
-      box-shadow: 0 0 0 6px rgba(168,85,247,.10);
-    }
-    .hero h2{ margin:10px 0 6px; font-size:28px; }
-    .hero p{ margin:0; color: var(--muted); line-height:1.55; }
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 20% 10%,rgba(168,85,247,.2),transparent 40%),
+radial-gradient(circle at 80% 0%,rgba(124,58,237,.15),transparent 40%),
+radial-gradient(circle at 50% 120%,rgba(168,85,247,.12),transparent 60%);
+z-index:-2;
+}
 
-    .stats{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      align-content:start;
-    }
-    .stat{
-      padding:12px;
-      border-radius: 16px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      position:relative;
-      overflow:hidden;
-    }
-    .stat:before{
-      content:"";
-      position:absolute; inset:-1px;
-      background: radial-gradient(240px 80px at 30% 0%, rgba(168,85,247,.22), transparent 60%);
-      opacity:.8;
-      pointer-events:none;
-    }
-    .stat .t{ font-size:11px; letter-spacing:.10em; text-transform:uppercase; color: var(--muted2); position:relative; }
-    .stat .v{ font-size:22px; font-weight:900; margin-top:6px; position:relative; }
-    .stat .s{ font-size:12px; color: var(--muted); margin-top:2px; position:relative; }
+/* grid lines */
 
-    .content{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:14px;
-    }
+.grid{
+position:fixed;
+inset:0;
+background:
+linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+background-size:60px 60px;
+opacity:.4;
+z-index:-1;
+}
 
-    .panel{
-      border-radius: var(--radius);
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .panelHead{
-      padding:14px 16px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px;
-    }
-    .panelHead h3{
-      margin:0; font-size:15px; letter-spacing:.02em;
-    }
-    .panelBody{
-      padding:16px;
-      color: var(--muted);
-      line-height:1.6;
-      font-size:14px;
-    }
-    .panelBody b{ color: var(--text); }
-    .hr{ height:1px; background: rgba(255,255,255,.08); margin:14px 0; }
+/* cursor glow */
 
-    .grid2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
-    }
-    @media (max-width: 980px){
-      .app{ grid-template-columns: 72px 1fr; }
-      .sidebar{ display:none; }
-      .heroInner{ grid-template-columns: 1fr; }
-      .grid2{ grid-template-columns: 1fr; }
-    }
+.cursor{
+width:400px;
+height:400px;
+position:fixed;
+border-radius:50%;
+pointer-events:none;
+background:radial-gradient(circle,rgba(168,85,247,.25),transparent 60%);
+filter:blur(80px);
+transform:translate(-50%,-50%);
+}
 
-    .cardList{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    .mini{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      border-radius: 16px;
-      padding:12px;
-    }
-    .mini .k{ color: var(--muted2); font-size:11px; letter-spacing:.10em; text-transform:uppercase; }
-    .mini .v{ margin-top:6px; color: var(--text); font-weight:850; font-size:14px; }
-    .mini ul{ margin:8px 0 0; padding-left:18px; }
-    .mini li{ margin:4px 0; color: var(--muted); }
+/* main container */
 
-    .qa{
-      display:grid;
-      gap:12px;
-    }
-    .qbox{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      border-radius: 16px;
-      padding:14px;
-    }
-    .qtop{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .qtop .meta{
-      color: var(--muted2);
-      font-size:12px;
-    }
-    .qtop .meta b{ color: var(--text); }
-    textarea{
-      width:100%;
-      min-height:110px;
-      resize: vertical;
-      padding:12px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.88);
-      outline:none;
-      line-height:1.45;
-    }
-    textarea:focus{ border-color: rgba(168,85,247,.35); box-shadow: 0 0 0 4px rgba(168,85,247,.10); }
+.container{
+max-width:1300px;
+margin:auto;
+padding:40px 30px;
+}
 
-    .badge{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:4px 10px;
-      border-radius:999px;
-      font-size:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.85);
-      font-weight:700;
-      white-space:nowrap;
-    }
-    .badge.good{ border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); }
-    .badge.bad{ border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); }
-    .badge.warn{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.10); }
+/* header */
 
-    .toast{
-      position: fixed;
-      right: 16px; bottom: 16px;
-      max-width: 380px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-      color: rgba(255,255,255,.90);
-      opacity:0;
-      transform: translateY(10px);
-      transition: opacity .18s ease, transform .18s ease;
-      pointer-events:none;
-      font-size: 13px;
-      line-height: 1.45;
-      z-index: 50;
-    }
-    .toast.show{ opacity:1; transform: translateY(0); }
-    .footer{
-      margin-top:16px;
-      color: rgba(255,255,255,.55);
-      font-size: 12px;
-      display:flex; justify-content:space-between; gap:10px;
-      padding: 6px 2px;
-    }
-    .fadeIn{ animation: fade .35s ease both; }
-    @keyframes fade{
-      from{ opacity:0; transform: translateY(6px); }
-      to{ opacity:1; transform: translateY(0); }
-    }
-  </style>
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:60px;
+}
+
+.logo{
+font-weight:900;
+font-size:24px;
+background:linear-gradient(90deg,#a855f7,#7c3aed);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+.button{
+padding:10px 18px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,.15);
+background:rgba(255,255,255,.05);
+cursor:pointer;
+transition:.3s;
+}
+
+.button:hover{
+transform:translateY(-2px);
+border-color:#a855f7;
+}
+
+/* hero */
+
+.hero{
+text-align:center;
+margin-bottom:80px;
+}
+
+.hero h1{
+font-size:48px;
+margin-bottom:20px;
+font-weight:900;
+}
+
+.hero p{
+color:#c7c4d8;
+max-width:700px;
+margin:auto;
+}
+
+/* glass panel */
+
+.panel{
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.12);
+border-radius:20px;
+padding:30px;
+backdrop-filter:blur(10px);
+box-shadow:0 30px 80px rgba(0,0,0,.6);
+margin-bottom:30px;
+}
+
+/* cards */
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:20px;
+margin-top:20px;
+}
+
+.card{
+background:rgba(0,0,0,.25);
+padding:20px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,.1);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-4px);
+border-color:#a855f7;
+}
+
+.card h3{
+font-size:14px;
+margin-bottom:10px;
+}
+
+.card p{
+font-size:13px;
+color:#c7c4d8;
+}
+
+/* training text */
+
+.training p{
+margin-bottom:16px;
+color:#c7c4d8;
+line-height:1.6;
+}
+
+/* question box */
+
+.question{
+margin-top:30px;
+padding:20px;
+border-radius:16px;
+background:rgba(0,0,0,.3);
+border:1px solid rgba(255,255,255,.1);
+}
+
+textarea{
+width:100%;
+margin-top:12px;
+padding:12px;
+border-radius:10px;
+background:rgba(0,0,0,.4);
+border:1px solid rgba(255,255,255,.15);
+color:white;
+resize:vertical;
+min-height:120px;
+}
+
+.submit{
+margin-top:16px;
+background:linear-gradient(90deg,#a855f7,#7c3aed);
+border:none;
+padding:12px 18px;
+border-radius:12px;
+font-weight:700;
+cursor:pointer;
+}
+
+</style>
 </head>
+
 <body>
-  <div class="vfx"></div>
-  <div class="noise"></div>
 
-  <div class="app">
-    <!-- Servers column (just vibes, 1-page still) -->
-    <aside class="servers">
-      <div class="svr active" id="svrVoid" title="Void Esports">
-        <div class="dot"></div>
-        <div class="logo">V</div>
-      </div>
-      <div class="svr" title="Training Suite">
-        <div class="dot"></div>
-        <div class="logo">TS</div>
-      </div>
-      <div style="margin-top:auto"></div>
-      <div class="svr" id="svrAdmin" title="Admin Login">
-        <div class="dot"></div>
-        <div class="logo">A</div>
-      </div>
-    </aside>
+<div class="grid"></div>
+<div class="cursor"></div>
 
-    <!-- Channels -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="img">V</div>
-        <div>
-          <h1>VOID ESPORTS</h1>
-          <p>Mod Training Suite v3.0</p>
-        </div>
-      </div>
+<div class="container">
 
-      <div class="chanGroup">Information</div>
-      <div class="chan" data-view="learn">
-        <span>announcements</span>
-        <span class="pill">Learn</span>
-      </div>
-      <div class="chan" data-view="rules">
-        <span>rules</span>
-      </div>
+<div class="header">
+<div class="logo">VOID MOD TRAINING</div>
+<button class="button">Certification</button>
+</div>
 
-      <div class="chanGroup">Ticket System</div>
-      <div class="chan active" data-view="tickets">
-        <span>・mod-tickets</span>
-        <span class="pill" id="ticketPill">Ticket #0001</span>
-      </div>
+<div class="hero">
+<h1>Void Staff Certification</h1>
+<p>
+Comprehensive certification program for Void Esports moderators.
+Master ticket handling, roster verification, and professional moderation.
+</p>
+</div>
 
-      <div class="chanGroup">Certification</div>
-      <div class="chan" data-view="practice">
-        <span>practice</span>
-      </div>
-      <div class="chan" data-view="test">
-        <span>test</span>
-        <span class="pill" id="scorePill">Score 0</span>
-      </div>
+<div class="panel">
 
-      <div class="sbfoot">
-        <span>Roster Standard</span>
-        <code>Verified Only</code>
-      </div>
-    </aside>
+<h2>Ticket System Training</h2>
 
-    <!-- Main -->
-    <main class="main">
-      <div class="topbar">
-        <div class="crumb">
-          <b>Void Esports</b> <span class="dot"></span>
-          <span id="crumbHere">mod-tickets</span>
-        </div>
-        <div class="actions">
-          <button class="btn ghost" id="btnReset">Reset Session</button>
-          <button class="btn primary" id="btnGoTest">Begin Test</button>
-        </div>
-      </div>
+<div class="training">
 
-      <section class="hero fadeIn" style="margin-top:14px">
-        <div class="heroInner">
-          <div>
-            <span class="kicker"><span class="spark"></span> Precision Intake System</span>
-            <h2 id="heroTitle">Void Mod Training</h2>
-            <p id="heroDesc">
-              Comprehensive certification program for new Void Esports moderators. Master ticket handling,
-              roster management, and community moderation through interactive scenarios and real-time testing.
-            </p>
-          </div>
+<p>
+Moderators manage the ticket system. Every applicant must follow verification procedures.
+</p>
 
-          <div class="stats">
-            <div class="stat">
-              <div class="t">Test Progress</div>
-              <div class="v"><span id="statQ">0</span>/<span id="statTotal">8</span></div>
-              <div class="s">Need <b>6/8</b> to pass</div>
-            </div>
-            <div class="stat">
-              <div class="t">Test Score</div>
-              <div class="v" id="statScore">0</div>
-              <div class="s" id="statScoreSub">Not started</div>
-            </div>
-            <div class="stat">
-              <div class="t">Proof Required</div>
-              <div class="v">Always</div>
-              <div class="s">Screenshots + links</div>
-            </div>
-            <div class="stat">
-              <div class="t">Anti-Fake Rule</div>
-              <div class="v">Active</div>
-              <div class="s">Ask twice, confirm twice</div>
-            </div>
-          </div>
-        </div>
-      </section>
+<p>
+You must always ask:
+</p>
 
-      <div class="content" id="viewRoot"></div>
+<p>
+Age → Role → Proof → Verification → Escalation
+</p>
 
-      <div class="footer">
-        <div>Void Mod Certification System • Single Page Build</div>
-        <div>© 2026 Void Esports.</div>
-      </div>
-    </main>
-  </div>
+<p>
+Never approve someone without proof.
+</p>
 
-  <div class="toast" id="toast"></div>
+</div>
 
-  <script>
-    /***************
-      CONFIG
-    ***************/
-    const ADMIN_PASSWORD = "STAFFACCESS"; // <-- change this
-    const PASS_SCORE = 6;
+</div>
 
-    const STORAGE_KEYS = {
-      attempts: "voidTraining_attempts_v1",
-      admin: "voidTraining_admin_authed_v1",
-      session: "voidTraining_session_v1"
-    };
+<div class="panel">
 
-    /***************
-      DATA (edit anytime)
-    ***************/
-    const TRAINING = {
-      ticketTypes: [
-        {
-          title: "General Ticket",
-          body: "Created by community members for support inquiries, moderator assistance, or reporting issues. Handle professionally and escalate when needed."
-        },
-        {
-          title: "Roster Ticket",
-          body: "Application channel for users seeking to join Void. Initial response must include age verification and direction to the right resources. Follow structured onboarding workflow."
-        }
-      ],
-      protocol: [
-        "Professional greeting first — no 'yo/bro' openings.",
-        "Ask what role they’re applying for.",
-        "Age verification is mandatory (ask twice if needed).",
-        "Request proof: tracker, earnings, clips, portfolios, links.",
-        "No edited screenshots. No cropped proof."
-      ],
-      roster: [
-        {
-          title: "🏆 Pro Roster",
-          items: [
-            "25,000+ Power Ranking",
-            "$1,000+ in Official Fortnite Earnings",
-            "Place and earn consistently",
-            "Represent Us In Game and On Your Socials"
-          ]
-        },
-        {
-          title: "🎮 Semi-Pro",
-          items: [
-            "10,000–25,000 PR",
-            "Place Consistently",
-            "Represent us in Game",
-            "Use our Fortnite Code",
-            "Must have earnings"
-          ]
-        },
-        {
-          title: "🎓 Academy Roster",
-          items: [
-            "500–10,000 PR",
-            "Place Consistently",
-            "Represent us in Game",
-            "Use our Fortnite Code"
-          ]
-        },
-        {
-          title: "🎨 Creative Roster",
-          items: [
-            "Smooth/Fast Mechanics",
-            "Must Be Unique",
-            "Must Be Able To Provide Clips When Asked",
-            "Represent Us In Game and On Your Socials"
-          ]
-        },
-        {
-          title: "🎙️ Streamer",
-          items: [
-            "1k+ Followers/Subscribers",
-            "Average 25+ Viewers Per Stream",
-            "Stream At Least 4x Per Week",
-            "Use Our Hashtags in Bio/Descriptions",
-            "Represent Us In Game and On Your Socials"
-          ]
-        },
-        {
-          title: "🎥 Content Creator",
-          items: [
-            ">1k Followers on Twitch/YouTube",
-            ">10k Followers on TikTok",
-            "Original/High Quality Posts",
-            "Willing to Help Out With Void Content",
-            "Must Post Actively",
-            "Represent Us In Game and On Your Socials"
-          ]
-        },
-        {
-          title: "🎬 Junior Content Creator",
-          items: [
-            ">500 Followers On Twitch/YouTube",
-            ">3k Followers On TikTok",
-            "Posts Are Original and High Quality",
-            "Willing To Grind to Become a Main Roster Content Creator",
-            "Represent Us In Game and On Your Socials"
-          ]
-        },
-        {
-          title: "🖌️ GFX/VFX",
-          items: [
-            "Experience With Editing",
-            "Portfolio Required",
-            "High-Quality Work (1440p or Higher)",
-            "Willing To Do Free Work For Staff/Roster",
-            "Deliver When Asked"
-          ]
-        }
-      ]
-    };
+<h2>Practice Question</h2>
 
-    const PRACTICE_SCENARIOS = [
-      {
-        title: "Scenario 1: General Roster Inquiry",
-        prompt: 'A user creates a roster ticket with the message: "I want to join the team, what should I do?"',
-        expected: [
-          "Professional greeting",
-          "Ask age (mandatory)",
-          "Ask what role they want",
-          "Direct to requirements + self-assessment",
-          "Ask for proof (tracker/clips/links)"
-        ],
-        sample: 'Hello! How may I assist you today? Also, what is your age? What role are you applying for? Please review the roster requirements and send the required proof (tracker/clips/links) so we can verify you.'
-      },
-      {
-        title: "Scenario 2: Pro/Semi-Pro Application",
-        prompt: "A user submits an application for Pro or Semi-Pro roster position.",
-        expected: [
-          "Request tracker + earnings proof",
-          "Verify authenticity (no edited/cropped)",
-          "Confirm region/platform",
-          "Escalate to operations/senior review"
-        ],
-        sample: "Hello! What is your age? Please send your Fortnite tracker link and official earnings proof. Also confirm region/platform. Once verified (no edits/crops), I’ll escalate to Operations for final review."
-      },
-      {
-        title: "Scenario 3: Academy Player Verification",
-        prompt: "An Academy roster applicant meets PR requirements.",
-        expected: [
-          "Verify tracker",
-          "Confirm representation requirements",
-          "Request proof of using code / branding",
-          "Welcome + assign role after proof"
-        ],
-        sample: "Hello! What is your age? Please link your tracker and provide proof you’re using our Fortnite code. After verification, we’ll complete onboarding and assign your Academy role."
-      }
-    ];
+<div class="question">
 
-    // 8-question test (auto-graded by keyword presence)
-    const TEST = [
-      {
-        q: 'Roster ticket comes in: "I want to join." Write your first message.',
-        mustIncludeAny: [
-          ["hello","hi","greetings"],
-          ["age","old"],
-          ["role","applying","apply"],
-          ["requirements","reqs","roster"],
-          ["proof","tracker","clips","links"]
-        ]
-      },
-      {
-        q: "User claims Pro roster. What proof do you ask for?",
-        mustIncludeAny: [
-          ["tracker"],
-          ["earnings","official"],
-          ["screenshot","proof"],
-          ["no edits","not edited","uncropped","not cropped"]
-        ]
-      },
-      {
-        q: "User is applying Creative roster. What do you request?",
-        mustIncludeAny: [
-          ["clips","video"],
-          ["unique","original"],
-          ["proof"],
-          ["review","department","creative"]
-        ]
-      },
-      {
-        q: "Streamer applicant. What checks do you do?",
-        mustIncludeAny: [
-          ["followers","subscribers"],
-          ["average","viewers"],
-          ["links","channel"],
-          ["hashtags","bio"],
-          ["schedule","4"]
-        ]
-      },
-      {
-        q: "Content Creator applicant. What requirements do you confirm?",
-        mustIncludeAny: [
-          ["tiktok"],
-          ["youtube","twitch"],
-          ["original","quality"],
-          ["post","active"],
-          ["void","represent"]
-        ]
-      },
-      {
-        q: "GFX/VFX applicant submits work. What do you do?",
-        mustIncludeAny: [
-          ["portfolio"],
-          ["1440"],
-          ["proof","work"],
-          ["deliver"],
-          ["lead","review"]
-        ]
-      },
-      {
-        q: "Anti-fake rule: explain it in one sentence.",
-        mustIncludeAny: [
-          ["ask","twice"],
-          ["two"],
-          ["answers","change"],
-          ["stop","deny"]
-        ]
-      },
-      {
-        q: "Closing a successful ticket: what do you say/do?",
-        mustIncludeAny: [
-          ["thank"],
-          ["roles"],
-          ["welcome"],
-          ["proof"],
-          ["have a nice day","good day"]
-        ]
-      }
-    ];
+<b>A user opens a ticket saying "I want to join Void."</b>
 
-    /***************
-      HELPERS
-    ***************/
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
-    const nowISO = () => new Date().toISOString();
+<textarea placeholder="Write your response as a moderator"></textarea>
 
-    function toast(msg){
-      const el = $("#toast");
-      el.textContent = msg;
-      el.classList.add("show");
-      clearTimeout(toast._t);
-      toast._t = setTimeout(()=> el.classList.remove("show"), 2600);
-    }
+<button class="submit">Submit Response</button>
 
-    function loadAttempts(){
-      try{ return JSON.parse(localStorage.getItem(STORAGE_KEYS.attempts) || "[]"); }
-      catch{ return []; }
-    }
-    function saveAttempt(attempt){
-      const all = loadAttempts();
-      all.unshift(attempt);
-      localStorage.setItem(STORAGE_KEYS.attempts, JSON.stringify(all.slice(0, 250)));
-    }
+</div>
 
-    function setAdminAuthed(v){
-      localStorage.setItem(STORAGE_KEYS.admin, v ? "1":"0");
-    }
-    function isAdminAuthed(){
-      return localStorage.getItem(STORAGE_KEYS.admin) === "1";
-    }
+</div>
 
-    function loadSession(){
-      try{
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.session) || "{}");
-      }catch{ return {}; }
-    }
-    function saveSession(s){
-      localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(s));
-    }
-    function resetSession(){
-      localStorage.removeItem(STORAGE_KEYS.session);
-      session = freshSession();
-      render(currentView);
-      toast("Session reset.");
-    }
+</div>
 
-    function freshSession(){
-      return {
-        testStarted: false,
-        testIndex: 0,
-        answers: Array(TEST.length).fill(""),
-        score: 0,
-        completed: false
-      };
-    }
+<script>
 
-    function norm(s){ return (s||"").toLowerCase(); }
-    function scoreAnswer(answer, must){
-      const a = norm(answer);
-      let ok = 0;
-      for(const group of must){
-        if(group.some(k => a.includes(k))) ok++;
-      }
-      return ok === must.length ? 1 : 0;
-    }
+/* cursor glow */
 
-    /***************
-      RENDER VIEWS
-    ***************/
-    const viewRoot = $("#viewRoot");
-    let currentView = "tickets";
-    let session = loadSession();
-    if(!session || !("answers" in session)) session = freshSession();
+const cursor=document.querySelector(".cursor")
 
-    function setCrumb(label){
-      $("#crumbHere").textContent = label;
-    }
+document.addEventListener("mousemove",e=>{
+cursor.style.left=e.clientX+"px"
+cursor.style.top=e.clientY+"px"
+})
 
-    function setStats(){
-      $("#statTotal").textContent = TEST.length;
-      $("#statQ").textContent = session.testStarted ? (session.testIndex) : 0;
-      $("#statScore").textContent = session.score || 0;
-      $("#scorePill").textContent = "Score " + (session.score || 0);
+</script>
 
-      if(!session.testStarted) $("#statScoreSub").textContent = "Not started";
-      else if(session.completed){
-        const passed = session.score >= PASS_SCORE;
-        $("#statScoreSub").textContent = passed ? "Passed" : "Failed";
-      }else{
-        $("#statScoreSub").textContent = "In progress";
-      }
-    }
-
-    function renderTickets(){
-      setCrumb("mod-tickets");
-      $("#heroTitle").textContent = "Void Mod Training";
-      $("#heroDesc").textContent =
-        "Comprehensive certification program for new Void Esports moderators. Master ticket handling, roster management, and community moderation through interactive scenarios and real-time testing.";
-
-      viewRoot.innerHTML = `
-        <div class="panel fadeIn">
-          <div class="panelHead">
-            <h3>Ticket Types</h3>
-            <span class="badge">Protocol</span>
-          </div>
-          <div class="panelBody">
-            <p>Your first and foremost responsibility as a mod is to efficiently manage the ticket system in Void Esports.</p>
-            <div class="grid2">
-              ${TRAINING.ticketTypes.map(t => `
-                <div class="mini">
-                  <div class="k">${t.title}</div>
-                  <div class="v">${t.body}</div>
-                </div>
-              `).join("")}
-            </div>
-
-            <div class="hr"></div>
-
-            <p><b>Protocol:</b></p>
-            <ul>
-              ${TRAINING.protocol.map(x=>`<li>${x}</li>`).join("")}
-            </ul>
-
-            <div class="hr"></div>
-
-            <p><b>Roster Categories & Requirements</b></p>
-            <div class="cardList">
-              ${TRAINING.roster.map(r => `
-                <div class="mini">
-                  <div class="k">${r.title}</div>
-                  <ul>
-                    ${r.items.map(i=>`<li>${i}</li>`).join("")}
-                  </ul>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        </div>
-
-        <div class="panel fadeIn">
-          <div class="panelHead">
-            <h3>Anti-Fake Verification Rule</h3>
-            <span class="badge warn">Strict</span>
-          </div>
-          <div class="panelBody">
-            Ask key requirements in <b>two different ways</b>. If answers change — intake stops.
-            Every verification must be documented before approval.
-          </div>
-        </div>
-      `;
-    }
-
-    function renderLearn(){
-      setCrumb("announcements");
-      $("#heroTitle").textContent = "Learn";
-      $("#heroDesc").textContent = "Read the training, then move into practice and test.";
-
-      viewRoot.innerHTML = `
-        <div class="panel fadeIn">
-          <div class="panelHead">
-            <h3>Learn • Training Brief</h3>
-            <span class="badge">Read</span>
-          </div>
-          <div class="panelBody">
-            <p><b>Goal:</b> You should be able to handle tickets professionally, verify applicants, and escalate correctly.</p>
-            <p><b>Always:</b> greeting → age → role → proof → verify → document → escalate (if needed).</p>
-            <div class="hr"></div>
-            <p><b>Quick reminders</b></p>
-            <ul>
-              <li>No favoritism. No shortcuts. Verified only.</li>
-              <li>Proof must be clear (no edits/crops).</li>
-              <li>Keep tone professional, not casual.</li>
-              <li>If they dodge questions or change answers, stop intake.</li>
-            </ul>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderRules(){
-      setCrumb("rules");
-      $("#heroTitle").textContent = "Rules";
-      $("#heroDesc").textContent = "These are the rules that moderators enforce and follow.";
-
-      viewRoot.innerHTML = `
-        <div class="panel fadeIn">
-          <div class="panelHead">
-            <h3>Rules • Moderator Standards</h3>
-            <span class="badge">Conduct</span>
-          </div>
-          <div class="panelBody">
-            <ul>
-              <li>Be respectful and consistent. No power trips.</li>
-              <li>Document key actions and keep everything professional.</li>
-              <li>Never approve without proof.</li>
-              <li>Escalate to senior staff when unsure.</li>
-              <li>Do not argue in tickets. If it becomes hostile, escalate and close properly.</li>
-            </ul>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderPractice(){
-      setCrumb("practice");
-      $("#heroTitle").textContent = "Practice";
-      $("#heroDesc").textContent = "Write your responses. Use Evaluate to check protocol coverage (not perfect AI, just structure).";
-
-      viewRoot.innerHTML = `
-        <div class="panel fadeIn">
-          <div class="panelHead">
-            <h3>Practical Assessment • Scenarios</h3>
-            <span class="badge">Practice</span>
-          </div>
-          <div class="panelBody">
-            <div class="qa" id="practiceList"></div>
-          </div>
-        </div>
-      `;
-
-      const list = $("#practiceList");
-      PRACTICE_SCENARIOS.forEach((s, idx) => {
-        const id = "p_" + idx;
-        const el = document.createElement("div");
-        el.className = "qbox";
-        el.innerHTML = `
-          <div class="qtop">
-            <div class="meta"><b>${s.title}</b><div style="margin-top:4px;color:var(--muted)">${s.prompt}</div></div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <span class="badge" id="${id}_badge">Not evaluated</span>
-              <button class="btn" data-eval="${idx}">Evaluate</button>
-            </div>
-          </div>
-          <textarea id="${id}_txt" placeholder="Type your response..."></textarea>
-          <div class="hr"></div>
-          <div class="meta"><b>Key elements to include:</b></div>
-          <ul>
-            ${s.expected.map(x=>`<li>${x}</li>`).join("")}
-          </ul>
-          <div class="hr"></div>
-          <div class="meta"><b>Example (one possible):</b></div>
-          <div style="color:rgba(255,255,255,.86)">${escapeHtml(s.sample)}</div>
-        `;
-        list.appendChild(el);
-      });
-
-      $$("[data-eval]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const idx = Number(btn.getAttribute("data-eval"));
-          const s = PRACTICE_SCENARIOS[idx];
-          const txt = $("#p_"+idx+"_txt").value;
-          const a = norm(txt);
-          let hit = 0;
-
-          // super simple checks: greeting/age/role/proof/escalate keywords
-          const checks = [
-            ["hello","hi","greetings"],
-            ["age","old"],
-            ["role","applying","apply"],
-            ["proof","tracker","clips","link","portfolio"],
-            ["review","department","ops","operations","escalate","ping"]
-          ];
-          checks.forEach(group => { if(group.some(k=>a.includes(k))) hit++; });
-
-          const badge = $("#p_"+idx+"_badge");
-          if(hit >= 3){
-            badge.className = "badge good";
-            badge.textContent = "Looks solid";
-            toast("Nice — your response hits key protocol points.");
-          }else{
-            badge.className = "badge warn";
-            badge.textContent = "Missing items";
-            toast("Add: greeting, age, role, proof, and escalation if needed.");
-          }
-        });
-      });
-    }
-
-    function renderTest(){
-      setCrumb("test");
-      $("#heroTitle").textContent = "Certification Test";
-      $("#heroDesc").textContent = "Answer 8 questions. You need 6/8 to pass. Answers are checked for protocol keywords.";
-
-      // start if not started
-      if(!session.testStarted){
-        viewRoot.innerHTML = `
-          <div class="panel fadeIn">
-            <div class="panelHead">
-              <h3>Ready to start?</h3>
-              <span class="badge">6/8 to pass</span>
-            </div>
-            <div class="panelBody">
-              <p>This test simulates real ticket handling. Keep responses professional.</p>
-              <button class="btn primary" id="btnStartTest">Begin Certification Test</button>
-              <button class="btn" id="btnBackTrain" style="margin-left:10px">Back to Training</button>
-            </div>
-          </div>
-        `;
-        $("#btnStartTest").addEventListener("click", () => {
-          session.testStarted = true;
-          session.testIndex = 0;
-          session.score = 0;
-          session.completed = false;
-          saveSession(session);
-          render("test");
-          toast("Test started.");
-        });
-        $("#btnBackTrain").addEventListener("click", ()=> setView("tickets"));
-        setStats();
-        return;
-      }
-
-      // completed screen
-      if(session.completed){
-        const passed = session.score >= PASS_SCORE;
-        const badgeClass = passed ? "good" : "bad";
-        const badgeText = passed ? "Passed" : "Failed";
-        viewRoot.innerHTML = `
-          <div class="panel fadeIn">
-            <div class="panelHead">
-              <h3>Test Complete!</h3>
-              <span class="badge ${badgeClass}">${badgeText}</span>
-            </div>
-            <div class="panelBody">
-              <p><b>Score:</b> ${session.score}/${TEST.length}</p>
-              <p>Your responses have been recorded.</p>
-              <div class="hr"></div>
-              <button class="btn primary" id="btnReview">Review Answers</button>
-              <button class="btn" id="btnToTraining" style="margin-left:10px">Back to Training</button>
-            </div>
-          </div>
-
-          <div class="panel fadeIn">
-            <div class="panelHead">
-              <h3>Answer Review</h3>
-              <span class="badge">Logged</span>
-            </div>
-            <div class="panelBody">
-              ${TEST.map((t,i)=>`
-                <div class="qbox" style="margin-bottom:12px">
-                  <div class="qtop">
-                    <div class="meta"><b>Q${i+1}.</b> ${escapeHtml(t.q)}</div>
-                    <span class="badge ${scoreAnswer(session.answers[i], t.mustIncludeAny) ? "good":"warn"}">
-                      ${scoreAnswer(session.answers[i], t.mustIncludeAny) ? "Scored":"Missed"}
-                    </span>
-                  </div>
-                  <div style="color:rgba(255,255,255,.86);white-space:pre-wrap">${escapeHtml(session.answers[i] || "(no answer)")}</div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `;
-        $("#btnToTraining").addEventListener("click", ()=> setView("tickets"));
-        $("#btnReview").addEventListener("click", ()=> toast("Scroll to see your answers."));
-        setStats();
-        return;
-      }
-
-      // question screen
-      const i = session.testIndex;
-      const q = TEST[i];
-
-      viewRoot.innerHTML = `
-        <div class="panel fadeIn">
-          <div class="panelHead">
-            <h3>Question ${i+1} of ${TEST.length}</h3>
-            <span class="badge">Need ${PASS_SCORE}/${TEST.length}</span>
-          </div>
-          <div class="panelBody">
-            <div class="qbox">
-              <div class="qtop">
-                <div class="meta"><b>Prompt:</b> ${escapeHtml(q.q)}</div>
-                <span class="badge" id="qBadge">In progress</span>
-              </div>
-              <textarea id="testAnswer" placeholder="Type your response...">${escapeHtml(session.answers[i] || "")}</textarea>
-              <div style="display:flex;gap:10px; margin-top:12px; flex-wrap:wrap;">
-                <button class="btn" id="btnSkip">Skip</button>
-                <button class="btn primary" id="btnSubmit">Submit Answer</button>
-              </div>
-              <div class="hr"></div>
-              <div class="meta"><b>Tip:</b> Include greeting, age verification, role, proof, and escalation where needed.</div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      $("#btnSkip").addEventListener("click", () => {
-        // keep answer as-is
-        session.testIndex = Math.min(TEST.length-1, session.testIndex + 1);
-        saveSession(session);
-        render("test");
-      });
-
-      $("#btnSubmit").addEventListener("click", () => {
-        const ans = $("#testAnswer").value || "";
-        session.answers[i] = ans;
-
-        const got = scoreAnswer(ans, q.mustIncludeAny);
-        session.score = 0;
-        // re-score all answered questions up to now
-        for(let k=0;k<TEST.length;k++){
-          session.score += scoreAnswer(session.answers[k], TEST[k].mustIncludeAny);
-        }
-
-        const badge = $("#qBadge");
-        if(got){
-          badge.className = "badge good";
-          badge.textContent = "Scored";
-        }else{
-          badge.className = "badge warn";
-          badge.textContent = "Missing protocol";
-        }
-
-        // next
-        if(i >= TEST.length - 1){
-          session.completed = true;
-
-          // log attempt
-          const attempt = {
-            at: nowISO(),
-            score: session.score,
-            total: TEST.length,
-            passed: session.score >= PASS_SCORE,
-            answers: session.answers.slice(0)
-          };
-          saveAttempt(attempt);
-          toast("Submitted. Attempt saved.");
-        }else{
-          session.testIndex++;
-          toast(got ? "Good." : "Add missing protocol items.");
-        }
-
-        saveSession(session);
-        render("test");
-      });
-
-      setStats();
-    }
-
-    function renderAdmin(){
-      setCrumb("admin");
-      $("#heroTitle").textContent = "Admin Login";
-      $("#heroDesc").textContent = "View recent attempts stored on this device/browser.";
-
-      if(!isAdminAuthed()){
-        viewRoot.innerHTML = `
-          <div class="panel fadeIn">
-            <div class="panelHead">
-              <h3>Admin Login</h3>
-              <span class="badge">Restricted</span>
-            </div>
-            <div class="panelBody">
-              <p>Enter the admin password to view attempts.</p>
-              <div class="qbox">
-                <input id="adminPass" type="password" placeholder="Admin password"
-                  style="width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.22);color:rgba(255,255,255,.88);outline:none"
-                />
-                <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-                  <button class="btn primary" id="btnAdminLogin">Login</button>
-                  <button class="btn" id="btnAdminBack">Back</button>
-                </div>
-                <div class="hr"></div>
-                <div class="meta">Tip: Change <code style="font-family:var(--mono)">ADMIN_PASSWORD</code> at the top of the file.</div>
-              </div>
-            </div>
-          </div>
-        `;
-        $("#btnAdminLogin").addEventListener("click", () => {
-          const v = $("#adminPass").value || "";
-          if(v === ADMIN_PASSWORD){
-            setAdminAuthed(true);
-            toast("Admin unlocked.");
-            render("admin");
-          }else{
-            toast("Wrong password.");
-          }
-        });
-        $("#btnAdminBack").addEventListener("click", ()=> setView("tickets"));
-        setStats();
-        return;
-      }
-
-      const attempts = loadAttempts();
-      viewRoot.innerHTML = `
-        <div class="panel fadeIn">
-          <div class="panelHead">
-            <h3>Attempts</h3>
-            <div style="display:flex;gap:10px;align-items:center">
-              <span class="badge">${attempts.length} saved</span>
-              <button class="btn" id="btnAdminLogout">Logout</button>
-              <button class="btn" id="btnClearAttempts">Clear Attempts</button>
-            </div>
-          </div>
-          <div class="panelBody">
-            ${attempts.length ? attempts.map((a, idx) => `
-              <div class="qbox" style="margin-bottom:12px">
-                <div class="qtop">
-                  <div class="meta">
-                    <b>Attempt #${attempts.length - idx}</b>
-                    <div style="margin-top:4px;color:var(--muted)">
-                      ${new Date(a.at).toLocaleString()}
-                    </div>
-                  </div>
-                  <span class="badge ${a.passed ? "good":"bad"}">${a.score}/${a.total} • ${a.passed ? "Passed":"Failed"}</span>
-                </div>
-                <details>
-                  <summary style="cursor:pointer;color:rgba(255,255,255,.86);font-weight:750">View answers</summary>
-                  <div class="hr"></div>
-                  ${a.answers.map((ans, i)=>`
-                    <div style="margin-bottom:12px">
-                      <div class="meta"><b>Q${i+1}:</b> ${escapeHtml(TEST[i].q)}</div>
-                      <div style="white-space:pre-wrap;color:rgba(255,255,255,.86);margin-top:6px">${escapeHtml(ans || "(no answer)")}</div>
-                    </div>
-                  `).join("")}
-                </details>
-              </div>
-            `).join("") : `<p>No attempts saved yet on this browser.</p>`}
-          </div>
-        </div>
-      `;
-
-      $("#btnAdminLogout").addEventListener("click", () => {
-        setAdminAuthed(false);
-        toast("Logged out.");
-        render("admin");
-      });
-      $("#btnClearAttempts").addEventListener("click", () => {
-        localStorage.removeItem(STORAGE_KEYS.attempts);
-        toast("Attempts cleared.");
-        render("admin");
-      });
-      setStats();
-    }
-
-    function render(view){
-      setStats();
-      if(view === "tickets") return renderTickets();
-      if(view === "learn") return renderLearn();
-      if(view === "rules") return renderRules();
-      if(view === "practice") return renderPractice();
-      if(view === "test") return renderTest();
-      if(view === "admin") return renderAdmin();
-      return renderTickets();
-    }
-
-    function setView(view){
-      currentView = view;
-      // highlight channel
-      $$(".chan").forEach(c => c.classList.toggle("active", c.getAttribute("data-view") === view));
-      render(view);
-    }
-
-    function escapeHtml(str){
-      return (str||"").replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-
-    /***************
-      WIRES
-    ***************/
-    // channels
-    $$(".chan").forEach(c => {
-      c.addEventListener("click", () => setView(c.getAttribute("data-view")));
-    });
-
-    // server buttons
-    $("#svrAdmin").addEventListener("click", () => setView("admin"));
-
-    $("#btnGoTest").addEventListener("click", () => setView("test"));
-    $("#btnReset").addEventListener("click", resetSession);
-
-    // init
-    setView("tickets");
-  </script>
 </body>
 </html>
