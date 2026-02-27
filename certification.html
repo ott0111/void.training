@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Certification | Void Staff Academy</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    /* Page-only helpers (kept small + clean) */
+    .exam-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-top:16px;
+    }
+    .exam-meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .progress{
+      height:10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .progress > div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(135deg, rgba(155,124,255,.95), rgba(109,75,255,.60));
+      transition:width .25s ease;
+    }
+
+    .q{
+      margin-top:16px;
+    }
+    .q-title{
+      font-weight:900;
+      letter-spacing:-.2px;
+      font-size:18px;
+      margin-bottom:10px;
+    }
+    .choice{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.025);
+      transition:transform .18s ease, border-color .18s ease, background .18s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+    .choice:hover{
+      transform:translateY(-1px);
+      border-color:rgba(155,124,255,.22);
+      background:rgba(155,124,255,.08);
+    }
+    .choice input{
+      margin-top:3px;
+      accent-color: var(--accent);
+      cursor:pointer;
+    }
+    .choice .txt{
+      color:rgba(244,242,255,.9);
+      line-height:1.35;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .result{
+      display:none;
+      margin-top:18px;
+    }
+    .result.good{
+      display:block;
+      border:1px solid rgba(155,124,255,.30);
+      background:rgba(155,124,255,.10);
+      border-radius:var(--radius);
+      padding:16px 16px;
+    }
+    .result.bad{
+      display:block;
+      border:1px solid rgba(255,110,110,.28);
+      background:rgba(255,110,110,.08);
+      border-radius:var(--radius);
+      padding:16px 16px;
+    }
+    .result h3{
+      font-weight:900;
+      margin-bottom:6px;
+    }
+    .muted{
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .small{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .divider{
+      height:1px;
+      width:100%;
+      background:rgba(255,255,255,.08);
+      margin:14px 0;
+    }
+  </style>
+</head>
+
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge"></div>
+      <div class="brand-title">
+        <div class="top">VOID STAFF</div>
+        <div class="sub">Training Academy</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="requirements.html">Requirements</a>
+      <a href="training.html">Training</a>
+      <a href="tickets.html">Ticket Handling</a>
+      <a href="scenarios.html">Scenarios</a>
+      <a href="roles.html">Departments</a>
+      <a href="moderation.html">Moderation Guide</a>
+      <a href="certification.html">Certification <span class="tag">EXAM</span></a>
+      <a href="faq.html">FAQ</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="container fade-in">
+
+      <div class="topbar">
+        <div class="breadcrumb">Void Esports / Staff Academy / Certification</div>
+      </div>
+
+      <section class="hero">
+        <h1>Trial Moderator Certification</h1>
+        <p>
+          This exam checks if you understand the training, ticket handling, and professionalism standards.
+          Answer carefully — this is what qualifies you to apply as a <strong>Trial Moderator</strong>.
+        </p>
+
+        <div class="exam-top">
+          <div class="exam-meta">
+            <span class="pill">Pass Score: <strong>&nbsp;80%</strong></span>
+            <span class="pill">Questions: <strong>&nbsp;<span id="qCount">0</span></strong></span>
+            <span class="pill">Progress: <strong>&nbsp;<span id="progressText">0%</span></strong></span>
+          </div>
+
+          <a class="btn" href="training.html">Review Training</a>
+        </div>
+
+        <div class="progress" aria-label="Progress">
+          <div id="bar"></div>
+        </div>
+
+        <div class="notice" style="margin-top:14px">
+          <strong>Reminder:</strong> In tickets, stay professional and structured. If you’re unsure, escalate to senior staff.
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <h3>Exam Rules</h3>
+        <div class="list">
+          <div class="item">Use professional language (no “yo/bro/sup”).</div>
+          <div class="item">Understand the ticket workflow: greet → role inquiry → age verification → request proof → escalate if needed → close ticket.</div>
+          <div class="item">If you fail, review the training and retake later.</div>
+        </div>
+      </section>
+
+      <!-- QUESTIONS -->
+      <section id="exam" class="card" style="margin-top:16px">
+        <h3>Questions</h3>
+        <p class="small">Select the best answer for each question.</p>
+
+        <div id="questions"></div>
+
+        <div class="actions">
+          <button class="btn" id="resetBtn" type="button">Reset Answers</button>
+          <button class="btn primary" id="submitBtn" type="button">Submit Exam</button>
+        </div>
+
+        <div id="resultGood" class="result good">
+          <h3>Passed ✅</h3>
+          <p class="muted">
+            Score: <strong><span id="scoreGood">0</span>%</strong><br>
+            You understand Void’s training standards. You may now apply for Trial Moderator through the proper process.
+          </p>
+          <div class="divider"></div>
+          <p class="small">
+            Tip: Keep your ticket responses structured and professional. Escalate serious issues to senior staff.
+          </p>
+        </div>
+
+        <div id="resultBad" class="result bad">
+          <h3>Not Passed ❌</h3>
+          <p class="muted">
+            Score: <strong><span id="scoreBad">0</span>%</strong><br>
+            Review the training pages and try again.
+          </p>
+          <div class="divider"></div>
+          <a class="btn primary" href="training.html">Go Back to Training</a>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // Premium but simple exam logic (no database)
+  const PASS_SCORE = 80;
+
+  const quiz = [
+    {
+      q: "What is the best way to start a ticket conversation?",
+      a: [
+        "Yo what do you need?",
+        "Hello, how may I help you today?",
+        "Sup, what role?",
+        "Bro just send your tracker"
+      ],
+      correct: 1
+    },
+    {
+      q: "After greeting, what should you ask next in an application ticket?",
+      a: [
+        "Ask for their password",
+        "Ask what role they are applying for",
+        "Tell them to hurry up",
+        "Give them roles immediately"
+      ],
+      correct: 1
+    },
+    {
+      q: "When should age verification happen?",
+      a: [
+        "Never, it’s rude",
+        "After you give roles",
+        "Before continuing the application process",
+        "Only if they mention being underage"
+      ],
+      correct: 2
+    },
+    {
+      q: "If a situation feels serious or you are unsure, what should you do?",
+      a: [
+        "Guess and continue",
+        "Argue until they listen",
+        "Escalate to senior staff with evidence/details",
+        "Ignore the ticket"
+      ],
+      correct: 2
+    },
+    {
+      q: "What proof is required for Semi-Pro / Pro roster applications?",
+      a: [
+        "Just say they’re good",
+        "Tracker + default dance screenshot, then ping operations",
+        "Only a YouTube link",
+        "A random screenshot"
+      ],
+      correct: 1
+    },
+    {
+      q: "What is an example of an unacceptable response in tickets?",
+      a: [
+        "Hello! What can I assist you with today?",
+        "Hello, please send your tracker link.",
+        "Bro send that rq",
+        "Hello, may I ask your current age?"
+      ],
+      correct: 2
+    },
+    {
+      q: "Blacklist tickets should include:",
+      a: [
+        "User, User ID, Reason (with details/evidence if possible)",
+        "Only the username",
+        "Only an opinion",
+        "No information"
+      ],
+      correct: 0
+    },
+    {
+      q: "How should you close a ticket after requirements are met?",
+      a: [
+        "Say nothing and leave",
+        "Assign roles, thank them, and close professionally",
+        "Roast them as a joke",
+        "Tell them to open another ticket"
+      ],
+      correct: 1
+    },
+    {
+      q: "For Content Creator applications, moderators should request:",
+      a: [
+        "Social media links and have Content Department review",
+        "A default dance screenshot",
+        "A credit card",
+        "Nothing at all"
+      ],
+      correct: 0
+    },
+    {
+      q: "What is the correct mindset for moderators?",
+      a: [
+        "Be helpful, patient, and professional",
+        "Be strict and rude",
+        "Be casual and ignore procedures",
+        "Be funny in every ticket"
+      ],
+      correct: 0
+    }
+  ];
+
+  const questionsEl = document.getElementById("questions");
+  const qCountEl = document.getElementById("qCount");
+  const barEl = document.getElementById("bar");
+  const progressTextEl = document.getElementById("progressText");
+
+  const goodBox = document.getElementById("resultGood");
+  const badBox = document.getElementById("resultBad");
+  const scoreGoodEl = document.getElementById("scoreGood");
+  const scoreBadEl = document.getElementById("scoreBad");
+
+  function render(){
+    qCountEl.textContent = quiz.length;
+
+    questionsEl.innerHTML = quiz.map((item, idx) => {
+      const choices = item.a.map((txt, cIdx) => {
+        const name = `q_${idx}`;
+        const id = `q_${idx}_${cIdx}`;
+        return `
+          <label class="choice" for="${id}">
+            <input id="${id}" type="radio" name="${name}" value="${cIdx}">
+            <div class="txt">${txt}</div>
+          </label>
+        `;
+      }).join("");
+
+      return `
+        <div class="q">
+          <div class="q-title">${idx+1}. ${item.q}</div>
+          <div class="list">${choices}</div>
+        </div>
+      `;
+    }).join("");
+
+    attachProgress();
+    updateProgress();
+  }
+
+  function getAnswers(){
+    return quiz.map((_, idx) => {
+      const picked = document.querySelector(`input[name="q_${idx}"]:checked`);
+      return picked ? Number(picked.value) : null;
+    });
+  }
+
+  function attachProgress(){
+    document.querySelectorAll('input[type="radio"]').forEach(r => {
+      r.addEventListener("change", updateProgress);
+    });
+  }
+
+  function updateProgress(){
+    const answers = getAnswers();
+    const answered = answers.filter(v => v !== null).length;
+    const pct = Math.round((answered / quiz.length) * 100);
+    barEl.style.width = pct + "%";
+    progressTextEl.textContent = pct + "%";
+  }
+
+  function grade(){
+    const answers = getAnswers();
+
+    // Must answer all
+    if (answers.some(v => v === null)){
+      alert("Please answer every question before submitting.");
+      return;
+    }
+
+    let correct = 0;
+    answers.forEach((val, idx) => {
+      if (val === quiz[idx].correct) correct++;
+    });
+
+    const score = Math.round((correct / quiz.length) * 100);
+
+    goodBox.style.display = "none";
+    badBox.style.display = "none";
+
+    if (score >= PASS_SCORE){
+      scoreGoodEl.textContent = score;
+      goodBox.style.display = "block";
+      goodBox.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      scoreBadEl.textContent = score;
+      badBox.style.display = "block";
+      badBox.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function resetAll(){
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    updateProgress();
+    goodBox.style.display = "none";
+    badBox.style.display = "none";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.getElementById("submitBtn").addEventListener("click", grade);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  render();
+</script>
+</body>
+</html>
