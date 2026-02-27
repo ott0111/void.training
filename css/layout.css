@@ -187,3 +187,6 @@
   .sidebar{ display:none; }
   .main{ padding:22px 18px 60px; }
 }
+body:has(title:contains("Certification")) .brand-logo{
+display:none;
+}
