@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Void Training — Mod Certification</title>
+  <title>Void Mod Training</title>
   <meta name="color-scheme" content="dark" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,7 @@
       --panel2: rgba(255,255,255,.07);
       --stroke: rgba(255,255,255,.10);
       --stroke2: rgba(255,255,255,.14);
+
       --text:#efeaff;
       --muted: rgba(239,234,255,.74);
       --muted2: rgba(239,234,255,.58);
@@ -50,6 +51,14 @@
       overflow-x:hidden;
     }
 
+    /* particles canvas */
+    canvas#fx{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.75;
+    }
+
     /* subtle scan + noise */
     .noise{
       position:fixed; inset:0;
@@ -60,7 +69,6 @@
       background-size:180px 180px;
       z-index:1;
     }
-
     .scan{
       position:fixed; inset:0;
       pointer-events:none;
@@ -75,30 +83,42 @@
       100%{ transform: translateY(160%); }
     }
 
-    /* neon grid lines (expensive feel) */
+    /* neon grid lines */
     .grid{
       position:fixed; inset:0;
       pointer-events:none;
-      opacity:.25;
+      opacity:.22;
       background:
         linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
       background-size: 64px 64px;
-      mask-image: radial-gradient(circle at 40% 20%, black 0%, black 35%, transparent 70%);
+      mask-image: radial-gradient(circle at 45% 15%, black 0%, black 35%, transparent 70%);
       z-index:0;
     }
 
     /* cursor glow */
     .cursor{
       position:fixed;
-      width:520px; height:520px;
+      width:560px; height:560px;
       border-radius:999px;
       pointer-events:none;
       background: radial-gradient(circle, rgba(168,85,247,.22), transparent 62%);
+      filter: blur(64px);
+      transform: translate(-50%,-50%);
+      opacity:.92;
+      z-index:0;
+    }
+    .cursor2{
+      position:fixed;
+      width:300px; height:300px;
+      border-radius:999px;
+      pointer-events:none;
+      background: radial-gradient(circle, rgba(6,182,212,.14), transparent 62%);
       filter: blur(60px);
       transform: translate(-50%,-50%);
-      opacity:.95;
+      opacity:.75;
       z-index:0;
+      mix-blend-mode: screen;
     }
 
     .app{
@@ -108,19 +128,20 @@
       min-height:100vh;
     }
 
-    /* left icon rail (matches your original vibe) */
+    /* left icon rail (spacing tuned to match video) */
     .railWrap{
       position:sticky;
       top:18px;
       height: calc(100vh - 36px);
       padding:18px 14px;
-      width:84px;
+      width:86px;
       display:flex;
       justify-content:center;
+      z-index:5;
     }
 
     .rail{
-      width:54px;
+      width:56px;
       border-radius: 16px;
       border:1px solid var(--stroke);
       background: rgba(0,0,0,.22);
@@ -134,7 +155,7 @@
     }
 
     .navBtn{
-      width:38px; height:38px;
+      width:40px; height:40px;
       border-radius: 12px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.03);
@@ -153,9 +174,9 @@
     }
 
     .navBtn.active{
-      border-color: rgba(34,197,94,.45);
-      background: rgba(34,197,94,.10);
-      box-shadow: 0 0 0 4px rgba(34,197,94,.12);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.05);
+      box-shadow: 0 0 0 4px rgba(168,85,247,.10);
     }
 
     .navBtn .dot{
@@ -175,9 +196,11 @@
     .content{
       flex:1;
       padding:18px 18px 50px 0;
+      position:relative;
+      z-index:2;
     }
 
-    /* top right admin button */
+    /* top right admin button like video */
     .topActions{
       position:fixed;
       top:16px; right:16px;
@@ -185,11 +208,6 @@
       display:flex;
       gap:10px;
       align-items:center;
-    }
-    .smallTag{
-      font-size:12px;
-      color: rgba(255,255,255,.65);
-      margin-right:8px;
     }
     .btn{
       border:1px solid rgba(255,255,255,.14);
@@ -210,20 +228,45 @@
       transform: translateY(-2px);
       border-color: rgba(168,85,247,.35);
     }
-    .btn.primary{
-      background: linear-gradient(90deg, rgba(168,85,247,.22), rgba(124,58,237,.18));
-      border-color: rgba(168,85,247,.35);
-    }
 
-    /* main container width */
+    /* main container width + spacing tuned */
     .wrap{
-      max-width: 1080px;
+      max-width: 1060px;
       margin: 0 auto;
-      padding: 56px 18px 0 18px; /* top padding so it sits under the top action */
+      padding: 58px 18px 0 18px; /* room under top action */
     }
 
     .section{
-      margin-top: 18px;
+      margin-top: 26px;
+    }
+
+    .heroTop{
+      text-align:center;
+      margin-top: 10px;
+      margin-bottom: 22px;
+    }
+    .heroTop h1{
+      margin:0;
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing:-1.3px;
+      background: linear-gradient(90deg, var(--purple), var(--purple2));
+      -webkit-background-clip: text;
+      background-clip:text;
+      color: transparent;
+      text-shadow: 0 0 24px rgba(168,85,247,.14);
+    }
+    .heroTop p{
+      margin: 10px auto 0;
+      max-width: 760px;
+      color: rgba(255,255,255,.72);
+      font-size: 15.5px;
+      line-height: 1.7;
+    }
+    .heroTop .madeBy{
+      margin-top: 12px;
+      font-size: 13px;
+      color: rgba(255,255,255,.55);
     }
 
     .hTitle{
@@ -248,11 +291,16 @@
       backdrop-filter: blur(12px);
       box-shadow: var(--shadow);
       overflow:hidden;
+      position:relative;
     }
-
-    .panelInner{
-      padding: 14px;
+    .panel::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(700px 200px at 30% 0%, rgba(168,85,247,.14), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
     }
+    .panelInner{ padding: 14px; position:relative; }
 
     .note{
       border:1px solid rgba(255,255,255,.10);
@@ -270,7 +318,6 @@
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
-
     .grid3{
       margin-top:12px;
       display:grid;
@@ -278,34 +325,57 @@
       gap: 12px;
     }
 
+    /* neon gradient border card (matches video) */
     .card{
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
       padding: 14px;
       position:relative;
       overflow:hidden;
-      transition: transform .18s ease, border-color .18s ease;
+      background: rgba(0,0,0,.24);
+      transform: translateZ(0);
+      transition: transform .18s ease;
+      border:1px solid rgba(255,255,255,.08);
+      min-height: 158px;
     }
-    .card:hover{
-      transform: translateY(-2px);
-      border-color: rgba(168,85,247,.30);
+    .card:hover{ transform: translateY(-2px); }
+
+    .cardGlow{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius: 16px;
+      padding:2px;
+      background: conic-gradient(from 180deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0) 20%,
+        var(--g1) 35%,
+        var(--g2) 55%,
+        rgba(255,255,255,0) 75%,
+        rgba(255,255,255,0) 100%);
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      opacity:.95;
+      filter: drop-shadow(0 0 18px rgba(168,85,247,.10));
+      pointer-events:none;
+    }
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius: 16px;
+      background: radial-gradient(380px 120px at 20% 0%, rgba(255,255,255,.06), transparent 60%);
+      opacity:.65;
+      pointer-events:none;
     }
 
-    /* neon edge cards (matches your original: green/purple/red) */
-    .edge{
-      position:absolute; inset:-1px;
-      pointer-events:none;
-      opacity:.85;
-      filter: blur(.2px);
-      border-radius: 16px;
-      mask-image: linear-gradient(#000 0 0);
-    }
-    .card.edgeGreen{ box-shadow: 0 0 0 1px rgba(34,197,94,.20), 0 0 28px rgba(34,197,94,.10); }
-    .card.edgePurple{ box-shadow: 0 0 0 1px rgba(168,85,247,.22), 0 0 28px rgba(168,85,247,.10); }
-    .card.edgeRed{ box-shadow: 0 0 0 1px rgba(239,68,68,.22), 0 0 28px rgba(239,68,68,.10); }
-    .card.edgeCyan{ box-shadow: 0 0 0 1px rgba(6,182,212,.22), 0 0 28px rgba(6,182,212,.10); }
-    .card.edgeYellow{ box-shadow: 0 0 0 1px rgba(245,158,11,.22), 0 0 28px rgba(245,158,11,.10); }
+    .edgeGreen{ --g1: rgba(34,197,94,.95); --g2: rgba(6,182,212,.90); }
+    .edgePurple{ --g1: rgba(168,85,247,.95); --g2: rgba(124,58,237,.90); }
+    .edgeRed{ --g1: rgba(239,68,68,.95); --g2: rgba(245,158,11,.85); }
+    .edgeCyan{ --g1: rgba(6,182,212,.95); --g2: rgba(34,197,94,.90); }
+    .edgeYellow{ --g1: rgba(245,158,11,.95); --g2: rgba(168,85,247,.75); }
 
     .cardTop{
       display:flex;
@@ -313,10 +383,11 @@
       align-items:center;
       justify-content:space-between;
       margin-bottom: 8px;
+      position:relative;
+      z-index:2;
     }
-    .cardTopLeft{
-      display:flex; align-items:center; gap:10px;
-    }
+    .cardTopLeft{ display:flex; align-items:center; gap:10px; }
+
     .badge{
       display:inline-flex;
       align-items:center;
@@ -341,12 +412,16 @@
       font-size: 14px;
       font-weight: 900;
       letter-spacing:.01em;
+      position:relative;
+      z-index:2;
     }
     .card p{
       margin: 0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.55;
+      position:relative;
+      z-index:2;
     }
     .card ul{
       margin: 10px 0 0;
@@ -354,6 +429,8 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.55;
+      position:relative;
+      z-index:2;
     }
     .card li{ margin: 4px 0; }
 
@@ -366,15 +443,25 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.55;
+      position:relative;
+      z-index:2;
     }
 
-    /* big command panel like your “Warn / Report Command” */
+    /* big command panel like video */
     .bigPanel{
       border-radius: var(--radius);
       border:1px solid rgba(34,197,94,.25);
       background: rgba(0,0,0,.22);
       box-shadow: 0 0 0 1px rgba(34,197,94,.18), 0 0 34px rgba(34,197,94,.10);
       overflow:hidden;
+      position:relative;
+    }
+    .bigPanel::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(700px 210px at 30% 0%, rgba(34,197,94,.12), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
     }
     .bigPanelHead{
       padding: 14px 14px;
@@ -383,6 +470,8 @@
       align-items:center;
       justify-content:space-between;
       gap:12px;
+      position:relative;
+      z-index:2;
     }
     .bigPanelHead h4{
       margin:0;
@@ -398,19 +487,28 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.6;
+      position:relative;
+      z-index:2;
     }
 
+    .divider{ height:1px; background: rgba(255,255,255,.08); margin: 12px 0; }
+
     /* certification */
-    .qa{
-      margin-top: 12px;
-      display:grid;
-      gap: 12px;
-    }
+    .qa{ margin-top: 12px; display:grid; gap: 12px; }
     .qbox{
       border-radius: 14px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.22);
       padding: 14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .qbox::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(480px 140px at 15% 0%, rgba(168,85,247,.10), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
     }
     .qTop{
       display:flex;
@@ -418,13 +516,18 @@
       justify-content:space-between;
       gap: 10px;
       margin-bottom: 10px;
+      position:relative;
+      z-index:2;
     }
     .qMeta{
       color: var(--muted2);
       font-size: 12px;
       line-height: 1.35;
+      position:relative;
+      z-index:2;
     }
     .qMeta b{ color: var(--text); }
+
     textarea{
       width:100%;
       min-height: 110px;
@@ -437,6 +540,8 @@
       outline:none;
       line-height: 1.5;
       font-size: 13px;
+      position:relative;
+      z-index:2;
     }
     textarea:focus{
       border-color: rgba(168,85,247,.35);
@@ -448,6 +553,8 @@
       gap:10px;
       flex-wrap:wrap;
       margin-top: 12px;
+      position:relative;
+      z-index:2;
     }
 
     .miniBtn{
@@ -469,14 +576,8 @@
       border-color: rgba(168,85,247,.35);
     }
 
-    .divider{
-      height:1px;
-      background: rgba(255,255,255,.08);
-      margin: 12px 0;
-    }
-
     .footer{
-      margin-top: 20px;
+      margin-top: 18px;
       color: rgba(255,255,255,.55);
       font-size: 12px;
       display:flex;
@@ -496,13 +597,21 @@
       padding: 18px;
     }
     .modal{
-      width:min(920px, 100%);
+      width:min(980px, 100%);
       border-radius: 18px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(10,8,20,.88);
       backdrop-filter: blur(14px);
       box-shadow: 0 30px 90px rgba(0,0,0,.75);
       overflow:hidden;
+      position:relative;
+    }
+    .modal::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(700px 220px at 25% 0%, rgba(168,85,247,.14), transparent 60%);
+      opacity:.95;
+      pointer-events:none;
     }
     .modalHead{
       padding: 14px 14px;
@@ -511,9 +620,11 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      position:relative;
+      z-index:2;
     }
     .modalHead h3{ margin:0; font-size: 14px; font-weight: 950; }
-    .modalBody{ padding: 14px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .modalBody{ padding: 14px; color: var(--muted); font-size: 13px; line-height: 1.6; position:relative; z-index:2; }
     .modalClose{
       border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.05);
@@ -550,34 +661,47 @@
       border-radius: 14px;
       padding: 12px;
       margin-top: 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .attempt::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(520px 150px at 18% 0%, rgba(6,182,212,.10), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
     }
     details summary{
       cursor:pointer;
       color: rgba(255,255,255,.90);
       font-weight: 900;
+      position:relative;
+      z-index:2;
     }
 
-    @media (max-width: 920px){
+    @media (max-width: 980px){
       .grid2{ grid-template-columns: 1fr; }
       .grid3{ grid-template-columns: 1fr; }
-      .topActions{ right: 12px; top: 12px; }
-      .wrap{ padding-top: 64px; }
+      .wrap{ padding-top: 68px; }
+      .heroTop h1{ font-size: 44px; }
     }
   </style>
 </head>
 
 <body>
+  <canvas id="fx"></canvas>
   <div class="cursor" id="cursor"></div>
+  <div class="cursor2" id="cursor2"></div>
   <div class="grid"></div>
   <div class="scan"></div>
   <div class="noise"></div>
 
   <!-- top right -->
   <div class="topActions">
-    <span class="smallTag">Made by</span>
     <button class="btn" id="adminBtn">
-      <!-- shield icon -->
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 9.4-8 10-4.6-.6-8-5-8-10V6l8-4z" stroke="rgba(255,255,255,.85)" stroke-width="2"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2l8 4v6c0 5-3.4 9.4-8 10-4.6-.6-8-5-8-10V6l8-4z" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+      </svg>
       Admin Login
     </button>
   </div>
@@ -588,27 +712,39 @@
       <div class="rail">
         <div class="navBtn active" data-target="secTickets" title="Ticket Types">
           <div class="dot"></div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 8h16v8H4V8z" stroke="rgba(255,255,255,.85)" stroke-width="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="rgba(255,255,255,.85)" stroke-width="2"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 8h16v8H4V8z" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+            <path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+          </svg>
         </div>
 
         <div class="navBtn" data-target="secRoster" title="Roster Requirements">
           <div class="dot"></div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 7h10M7 12h10M7 17h10" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M7 7h10M7 12h10M7 17h10" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </div>
 
         <div class="navBtn" data-target="secCommands" title="Mod Commands">
           <div class="dot"></div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h16" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 6h16M4 12h10M4 18h16" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </div>
 
         <div class="navBtn" data-target="secClose" title="Closing Tickets">
           <div class="dot"></div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
 
         <div class="navBtn" data-target="secCert" title="Certification (30 Questions)">
           <div class="dot"></div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 3h10v14H7V3z" stroke="rgba(255,255,255,.85)" stroke-width="2"/><path d="M9 21l3-2 3 2" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M7 3h10v14H7V3z" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+            <path d="M9 21l3-2 3 2" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </div>
       </div>
     </div>
@@ -616,6 +752,16 @@
     <!-- main content -->
     <div class="content">
       <div class="wrap">
+
+        <!-- HERO (exact request) -->
+        <div class="heroTop">
+          <h1>Void Mod Training</h1>
+          <p>
+            Comprehensive certification program for new Void Esports moderators. Master ticket handling, roster management,
+            and community moderation through interactive scenarios and real-time testing.
+          </p>
+          <div class="madeBy">Made by <b>VD Yeezy</b></div>
+        </div>
 
         <!-- SECTION: Ticket Types -->
         <section class="section" id="secTickets">
@@ -630,6 +776,7 @@
 
               <div class="grid2">
                 <div class="card edgeGreen">
+                  <i class="cardGlow"></i>
                   <div class="cardTop">
                     <div class="cardTopLeft">
                       <span class="badge green">👥</span>
@@ -637,12 +784,13 @@
                     </div>
                   </div>
                   <p>
-                    These are created by community members for support inquiries, moderator assistance, or reporting issues.
-                    Handle with professionalism and follow escalation procedures for complex matters.
+                    Created by community members for support inquiries, moderator assistance, or reporting issues.
+                    Handle professionally and escalate when needed.
                   </p>
                 </div>
 
                 <div class="card edgePurple">
+                  <i class="cardGlow"></i>
                   <div class="cardTop">
                     <div class="cardTopLeft">
                       <span class="badge purple">👤</span>
@@ -650,14 +798,14 @@
                     </div>
                   </div>
                   <p>
-                    Application channel for users seeking to join Void Esports. Initial response must include age verification
-                    and direction to appropriate resources. Follow structured onboarding workflow.
+                    Application channel for users seeking to join Void. Initial response must include age verification
+                    and direction to the right resources. Follow structured onboarding workflow.
                   </p>
                 </div>
               </div>
 
               <div class="protocol">
-                <b>Protocol:</b> All ticket responses should begin with professional greeting and age inquiry. Direct new applicants to the appropriate channels and maintain detailed records of all interactions.
+                <b>Protocol:</b> Start with a professional greeting, confirm age, confirm role, request proof, verify authenticity, document outcome, then escalate if necessary.
               </div>
             </div>
           </div>
@@ -671,11 +819,8 @@
             <div class="panelInner">
               <div class="grid3">
                 <div class="card edgeGreen">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge green">🏆</span><h4>Pro Roster</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge green">🏆</span><h4>Pro Roster</h4></div></div>
                   <ul>
                     <li>25,000+ Power Ranking</li>
                     <li>$1,000+ in Official Fortnite Earnings</li>
@@ -685,11 +830,8 @@
                 </div>
 
                 <div class="card edgePurple">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge purple">🎮</span><h4>Semi-Pro</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge purple">🎮</span><h4>Semi-Pro</h4></div></div>
                   <ul>
                     <li>10,000–25,000 PR</li>
                     <li>Place consistently</li>
@@ -700,11 +842,8 @@
                 </div>
 
                 <div class="card edgeCyan">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge cyan">🎓</span><h4>Academy Roster</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge cyan">🎓</span><h4>Academy Roster</h4></div></div>
                   <ul>
                     <li>500–10,000 PR</li>
                     <li>Place consistently</li>
@@ -714,11 +853,8 @@
                 </div>
 
                 <div class="card edgePurple">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge purple">🎨</span><h4>Creative Roster</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge purple">🎨</span><h4>Creative Roster</h4></div></div>
                   <ul>
                     <li>Smooth/Fast mechanics</li>
                     <li>Must be unique</li>
@@ -728,11 +864,8 @@
                 </div>
 
                 <div class="card edgeYellow">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge yellow">🎙️</span><h4>Streamer</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge yellow">🎙️</span><h4>Streamer</h4></div></div>
                   <ul>
                     <li>1k+ followers/subscribers</li>
                     <li>Average 25+ viewers</li>
@@ -743,11 +876,8 @@
                 </div>
 
                 <div class="card edgeGreen">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge green">🎥</span><h4>Content Creator</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge green">🎥</span><h4>Content Creator</h4></div></div>
                   <ul>
                     <li>1k+ on Twitch/YouTube</li>
                     <li>10k+ on TikTok</li>
@@ -758,11 +888,8 @@
                 </div>
 
                 <div class="card edgeCyan">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge cyan">🎬</span><h4>Junior Content Creator</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge cyan">🎬</span><h4>Junior Content Creator</h4></div></div>
                   <ul>
                     <li>500+ on Twitch/YouTube</li>
                     <li>3k+ on TikTok</li>
@@ -773,11 +900,8 @@
                 </div>
 
                 <div class="card edgeRed">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge red">🖌️</span><h4>GFX/VFX</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge red">🖌️</span><h4>GFX/VFX</h4></div></div>
                   <ul>
                     <li>Experience with editing</li>
                     <li>Portfolio required</li>
@@ -787,6 +911,74 @@
                   </ul>
                 </div>
               </div>
+
+              <!-- Extra cards requested (Content Creator / Coach / Grinder+ / Blacklist) -->
+              <div class="grid2" style="margin-top:12px">
+                <div class="card edgeGreen">
+                  <i class="cardGlow"></i>
+                  <div class="cardTop">
+                    <div class="cardTopLeft">
+                      <span class="badge green">🎥</span>
+                      <h4>Content Creator</h4>
+                    </div>
+                  </div>
+                  <ul>
+                    <li>Original + consistent content</li>
+                    <li>Verified accounts (no bought followers)</li>
+                    <li>Represents Void on socials</li>
+                    <li>Willing to help Void content</li>
+                  </ul>
+                </div>
+
+                <div class="card edgeCyan">
+                  <i class="cardGlow"></i>
+                  <div class="cardTop">
+                    <div class="cardTopLeft">
+                      <span class="badge cyan">🧠</span>
+                      <h4>Coach</h4>
+                    </div>
+                  </div>
+                  <ul>
+                    <li>Strong comp knowledge + communication</li>
+                    <li>Can review VODs + give improvements</li>
+                    <li>Reliable scheduling</li>
+                    <li>Professional representation</li>
+                  </ul>
+                </div>
+
+                <div class="card edgePurple">
+                  <i class="cardGlow"></i>
+                  <div class="cardTop">
+                    <div class="cardTopLeft">
+                      <span class="badge purple">⚡</span>
+                      <h4>Grinder+</h4>
+                    </div>
+                  </div>
+                  <ul>
+                    <li>Extremely active competitor</li>
+                    <li>Consistent improvement & placements</li>
+                    <li>Long-term commitment</li>
+                    <li>Represents Void in game</li>
+                  </ul>
+                </div>
+
+                <div class="card edgeRed">
+                  <i class="cardGlow"></i>
+                  <div class="cardTop">
+                    <div class="cardTopLeft">
+                      <span class="badge red">⛔</span>
+                      <h4>Blacklist</h4>
+                    </div>
+                  </div>
+                  <ul>
+                    <li>Underage applicants</li>
+                    <li>Fake proof / fraud / impersonation</li>
+                    <li>Harassment or toxic behavior</li>
+                    <li>Repeated major violations</li>
+                  </ul>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
@@ -819,6 +1011,7 @@
 
           <div class="grid2" style="margin-top:12px">
             <div class="card edgePurple">
+              <i class="cardGlow"></i>
               <div class="cardTop">
                 <div class="cardTopLeft">
                   <span class="badge purple">🧾</span>
@@ -832,6 +1025,7 @@
             </div>
 
             <div class="card edgeRed">
+              <i class="cardGlow"></i>
               <div class="cardTop">
                 <div class="cardTopLeft">
                   <span class="badge red">⛔</span>
@@ -839,7 +1033,7 @@
                 </div>
               </div>
               <p>
-                Blacklist is serious: confirm identity, collect proof, and escalate for approval. Do not argue. Do not threaten.
+                Blacklist is serious: confirm identity, collect proof, and escalate for approval. Do not argue.
                 Keep it short, professional, and final.
               </p>
               <ul>
@@ -859,11 +1053,8 @@
             <div class="panelInner">
               <div class="grid2">
                 <div class="card edgeGreen">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge green">✅</span><h4>Successful Close</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge green">✅</span><h4>Successful Close</h4></div></div>
                   <ul>
                     <li>Confirm requirements were met</li>
                     <li>Confirm proof was verified (no edits/crops)</li>
@@ -873,11 +1064,8 @@
                 </div>
 
                 <div class="card edgeRed">
-                  <div class="cardTop">
-                    <div class="cardTopLeft">
-                      <span class="badge red">🚫</span><h4>Denial Close</h4>
-                    </div>
-                  </div>
+                  <i class="cardGlow"></i>
+                  <div class="cardTop"><div class="cardTopLeft"><span class="badge red">🚫</span><h4>Denial Close</h4></div></div>
                   <ul>
                     <li>State denial reason briefly</li>
                     <li>No arguing, no debate</li>
@@ -901,7 +1089,8 @@
           <div class="panel">
             <div class="panelInner">
               <div class="note">
-                Answer all <b>30</b> questions. These are hard, but easy to understand. Your score is calculated from key protocol elements (proof, verification, escalation, professionalism).
+                Answer all <b>30</b> questions. These are hard, but easy to understand. Your score is calculated from protocol pillars
+                (proof, verification, escalation, professionalism, documentation).
                 <br><br>
                 <b>Pass:</b> <span id="passLine">24/30</span> • Attempts save on this device (GitHub Pages friendly).
               </div>
@@ -945,23 +1134,34 @@
     /*********************
       SETTINGS
     *********************/
-    const ADMIN_PASSWORD = "STAFFACCESS";
+    const ADMIN_PASSWORD = "CHANGE_THIS_PASSWORD";
     const PASS = 24;
 
     const KEYS = {
-      answers: "void_cert_answers_v1",
-      attempts: "void_cert_attempts_v1",
-      adminAuthed: "void_admin_authed_v1"
+      answers: "void_cert_answers_v2",
+      attempts: "void_cert_attempts_v2",
+      adminAuthed: "void_admin_authed_v2"
     };
 
     /*********************
-      CURSOR GLOW
+      CURSOR GLOW (dual layer)
     *********************/
     const cursor = document.getElementById("cursor");
+    const cursor2 = document.getElementById("cursor2");
+    let mx=0,my=0, mx2=0,my2=0;
     window.addEventListener("mousemove", (e) => {
-      cursor.style.left = e.clientX + "px";
-      cursor.style.top = e.clientY + "px";
+      mx = e.clientX; my = e.clientY;
     });
+    function cursorLoop(){
+      mx2 += (mx - mx2) * 0.12;
+      my2 += (my - my2) * 0.12;
+      cursor.style.left = mx + "px";
+      cursor.style.top  = my + "px";
+      cursor2.style.left = mx2 + "px";
+      cursor2.style.top  = my2 + "px";
+      requestAnimationFrame(cursorLoop);
+    }
+    cursorLoop();
 
     /*********************
       SCROLL SPY NAV
@@ -978,14 +1178,13 @@
       .map(id => document.getElementById(id));
 
     const io = new IntersectionObserver((entries) => {
-      // pick most visible
       const visible = entries
         .filter(e => e.isIntersecting)
         .sort((a,b)=> b.intersectionRatio - a.intersectionRatio)[0];
       if(!visible) return;
       const id = visible.target.id;
       navBtns.forEach(b => b.classList.toggle("active", b.getAttribute("data-target") === id));
-    }, {threshold:[0.15,0.25,0.35,0.45,0.55]});
+    }, {threshold:[0.12,0.22,0.32,0.42,0.52,0.62]});
 
     sections.forEach(s => io.observe(s));
 
@@ -997,22 +1196,22 @@
       "A user claims 25k+ PR but refuses to send a tracker link. What do you do and how do you respond?",
       "You receive a screenshot of earnings but it looks cropped. What verification steps do you take?",
       "A Semi-Pro applicant has PR but no earnings. What do you say and what outcome happens?",
-      "A Pro applicant has earnings proof but their region doesn’t match the team’s eligibility rules. How do you handle it?",
-      "A Creative Roster applicant says they’re “unique” but provides no clips. What do you ask for?",
+      "A Pro applicant has earnings proof but their region doesn’t match eligibility rules. How do you handle it?",
+      "A Creative applicant says they’re “unique” but provides no clips. What do you ask for?",
       "A Content Creator has 10k TikTok followers but engagement is extremely low. What red flags do you check for?",
       "A streamer meets follower requirements but streams 1x/week. Do they qualify? Explain your response.",
       "A Junior Content Creator wants to be upgraded immediately. What standard do you apply?",
       "A GFX/VFX applicant has a portfolio but most work is 1080p. What do you do?",
-      "An applicant tries to pressure you: “Just let me in, I know the owner.” What do you say?",
+      "An applicant pressures you: “Just let me in, I know the owner.” What do you say?",
       "Explain the Anti-Fake Verification Rule in one sentence, then show how you’d apply it in a ticket.",
       "A user changes their age answer when asked twice. What is the correct action and why?",
-      "A user gets aggressive in a ticket after being denied. How do you close the ticket professionally?",
+      "A user gets aggressive after being denied. How do you close the ticket professionally?",
       "Someone submits a tracker link that doesn’t match their in-game name. What do you do?",
       "List the minimum fields you must document for a serious moderation action (warn/report).",
       "When should you escalate a ticket to senior staff instead of handling it alone?",
       "A report comes in with no proof, only claims. What do you ask for and how do you proceed?",
       "You suspect bought followers. Name 3 checks you do before approving a creator.",
-      "How do you handle a roster applicant who is qualified but refuses to represent Void on socials?",
+      "How do you handle an applicant who is qualified but refuses to represent Void on socials?",
       "A Pro applicant provides “unofficial” earnings screenshots. What’s the correct requirement for earnings proof?",
       "A Creative applicant submits reused clips from another player. What is your response and action?",
       "A user asks for exceptions to requirements. What’s the policy response?",
@@ -1020,36 +1219,31 @@
       "What is the correct denial protocol wording style (tone + structure)? Give an example.",
       "How do you verify authenticity of screenshots without being rude?",
       "A ticket is inactive for hours. What do you do (follow-up + close procedure)?",
-      "A user applies for multiple roles at once. How do you organize the intake and decision?",
+      "A user applies for multiple roles at once. How do you organize intake and decision?",
       "Define “Verified Only” in practical terms for roster decisions.",
       "Write your closing message for a successful roster approval (include next steps)."
     ];
 
-    // Keyword scoring per question: each question expects certain “protocol pillars”
-    // This keeps it “hard but understandable” and still auto-scorable on GitHub Pages.
     const PILLARS = [
-      ["hello","hi","greetings"],           // professionalism / greeting
-      ["age","old"],                        // age check
+      ["hello","hi","greetings"], // professionalism / greeting
+      ["age","old"], // age check
       ["proof","tracker","link","clips","portfolio","earnings","screenshot"], // proof
-      ["verify","verification","confirm","check"], // verification
-      ["document","log","record"],          // documentation
+      ["verify","verification","confirm","check","cross-check"], // verification
+      ["document","log","record"], // documentation
       ["escalate","senior","ops","operations","lead"], // escalation
-      ["deny","denial","not qualify","cannot"], // denial clarity
-      ["represent","social","hashtags","code"] // representation / branding
+      ["deny","denial","not qualify","cannot","refuse"], // denial clarity
+      ["represent","social","hashtags","code","branding"] // branding
     ];
 
     function norm(s){ return (s||"").toLowerCase(); }
 
-    // per-question scoring: require 3–5 pillars depending on the question
-    // (keeps it “very hard”)
     const REQS = QUESTIONS.map((_,i)=>{
-      // default
       let need = [2,3,4]; // proof + verify + document baseline
       if(i === 0) need = [0,1,2,3]; // greeting + age + proof + verify
-      if([1,2,3,4,10,12,13,14,20,21,22,23,24,25,26].includes(i)) need = [2,3,5,6]; // proof+verify+escalate+deny
-      if([6,7,8,9,18,19].includes(i)) need = [2,3,7,5]; // proof+verify+branding+escalate
-      if([15,16,17].includes(i)) need = [4,5,2]; // document + escalate + proof
-      if([29].includes(i)) need = [0,2,4,5]; // greeting + proof + document + escalate
+      if([1,2,3,4,10,12,13,14,20,21,22,23,24,25,26].includes(i)) need = [2,3,5,6];
+      if([6,7,8,9,18,19].includes(i)) need = [2,3,7,5];
+      if([15,16,17].includes(i)) need = [4,5,2];
+      if([29].includes(i)) need = [0,2,4,5];
       return Array.from(new Set(need));
     });
 
@@ -1061,7 +1255,6 @@
         const words = PILLARS[pillarIndex];
         if(words.some(w => a.includes(w))) ok++;
       }
-      // question counts as correct if they hit all required pillars
       return ok >= req.length ? 1 : 0;
     }
 
@@ -1102,6 +1295,12 @@
       return {filled, score};
     }
 
+    function escapeHtml(str){
+      return (str||"").replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
     function renderQuestions(){
       qa.innerHTML = "";
       for(let i=0;i<QUESTIONS.length;i++){
@@ -1125,7 +1324,6 @@
         qa.appendChild(box);
       }
 
-      // save on input
       qa.querySelectorAll("textarea").forEach(t=>{
         t.addEventListener("input", ()=>{
           const idx = Number(t.getAttribute("data-q"));
@@ -1149,20 +1347,16 @@
         b.addEventListener("click", ()=>{
           const idx = Number(b.getAttribute("data-eval"));
           const ok = scoreAnswer(idx, answers[idx]);
-          if(ok) alert("✅ Meets standard: your answer includes the required verification/protocol pillars.");
-          else alert("⚠️ Missing protocol: add proof + verification + documentation/escalation depending on the scenario.");
+          alert(ok
+            ? "✅ Meets standard: your answer includes the required protocol pillars."
+            : "⚠️ Missing protocol: add proof + verification + documentation/escalation depending on the scenario."
+          );
           renderQuestions();
           calc();
         });
       });
 
       calc();
-    }
-
-    function escapeHtml(str){
-      return (str||"").replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
     }
 
     document.getElementById("startBtn").addEventListener("click", ()=>{
@@ -1192,7 +1386,6 @@
       alert(`Submitted!\nScore: ${score}/30\nResult: ${score >= PASS ? "PASSED ✅" : "FAILED ❌"}`);
     });
 
-    // initial badges without rendering the full 30 immediately
     calc();
 
     /*********************
@@ -1220,7 +1413,6 @@
 
     modalClose.addEventListener("click", closeModal);
     modalBack.addEventListener("click", (e)=>{ if(e.target === modalBack) closeModal(); });
-
     adminBtn.addEventListener("click", openModal);
 
     function renderAdmin(){
@@ -1255,14 +1447,14 @@
         if(!attempts.length) return `<div class="note">No attempts saved on this browser yet.</div>`;
         return attempts.map((a, idx)=>`
           <div class="attempt">
-            <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;position:relative;z-index:2">
               <div>
                 <div style="font-weight:900;color:rgba(255,255,255,.92)">Attempt #${attempts.length-idx}</div>
                 <div style="color:rgba(255,255,255,.62);font-size:12px">${new Date(a.at).toLocaleString()}</div>
               </div>
               <span class="badge ${a.passed ? "green" : "red"}">${a.score}/${a.total} • ${a.passed ? "Passed" : "Failed"}</span>
             </div>
-            <details style="margin-top:10px">
+            <details style="margin-top:10px;position:relative;z-index:2">
               <summary>View answers</summary>
               <div class="divider"></div>
               ${a.answers.map((ans,i)=>`
@@ -1295,6 +1487,70 @@
         renderAdmin();
       });
     }
+
+    /*********************
+      PARTICLE FX (expensive background motion)
+    *********************/
+    const c = document.getElementById("fx");
+    const ctx = c.getContext("2d");
+    let W=0,H=0;
+    function resize(){
+      W = c.width = window.innerWidth * devicePixelRatio;
+      H = c.height = window.innerHeight * devicePixelRatio;
+      c.style.width = window.innerWidth+"px";
+      c.style.height = window.innerHeight+"px";
+      ctx.setTransform(1,0,0,1,0,0);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const rand = (a,b)=> a + Math.random()*(b-a);
+    const dots = Array.from({length: 60}).map(()=>({
+      x: rand(0,W), y: rand(0,H),
+      r: rand(0.8, 1.9) * devicePixelRatio,
+      vx: rand(-0.12, 0.12) * devicePixelRatio,
+      vy: rand(-0.10, 0.10) * devicePixelRatio,
+      a: rand(0.18, 0.45)
+    }));
+
+    function loop(){
+      ctx.clearRect(0,0,W,H);
+
+      // subtle connecting lines
+      for(let i=0;i<dots.length;i++){
+        const p = dots[i];
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0||p.x>W) p.vx *= -1;
+        if(p.y<0||p.y>H) p.vy *= -1;
+
+        // dots
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(168,85,247,${p.a})`;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      // lines
+      for(let i=0;i<dots.length;i++){
+        for(let j=i+1;j<dots.length;j++){
+          const a = dots[i], b = dots[j];
+          const dx = a.x-b.x, dy = a.y-b.y;
+          const d = Math.sqrt(dx*dx+dy*dy);
+          if(d < 180*devicePixelRatio){
+            const alpha = (1 - d/(180*devicePixelRatio)) * 0.10;
+            ctx.strokeStyle = `rgba(6,182,212,${alpha})`;
+            ctx.lineWidth = 1*devicePixelRatio;
+            ctx.beginPath();
+            ctx.moveTo(a.x,a.y);
+            ctx.lineTo(b.x,b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(loop);
+    }
+    loop();
   </script>
 </body>
 </html>
