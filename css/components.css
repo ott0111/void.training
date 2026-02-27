@@ -156,3 +156,10 @@
 .btn.primary:hover{
   background: linear-gradient(135deg, rgba(155,124,255,1), rgba(109,75,255,.75));
 }
+.hero-logo{
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  object-fit:cover;
+  overflow:hidden;
+}
